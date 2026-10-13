@@ -1,0 +1,64 @@
+# --- Laravel ---
+/vendor
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/storage/logs/*.log
+/bootstrap/cache/*.php
+.phpunit.cache
+.phpunit.result.cache
+.phpactor.json
+
+# --- Environment (JANGAN commit secret) ---
+.env
+.env.backup
+.env.production
+.env.local
+.env.*.local
+# izinkan contoh, abaikan sisanya
+!.env.example
+
+# --- Database lokal ---
+*.sqlite
+*.sqlite-journal
+/database/database.sqlite
+/database/*.sqlite
+
+# --- Log & cache ---
+npm-debug.log
+yarn-error.log
+npm-debug.log*
+yarn-debug.log*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Editor / IDE ---
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+*.swp
+*.swo
+*~
+
+# --- Misc ---
+Homestead.json
+Homestead.yaml
+/auth.json
+composer.phar
+
+# --- PENTING: jangan ignore dokumentasi gambar ---
+# erd.png dan flowchart.png di root WAJIB ke-commit
+!erd.png
+!flowchart.png
+!docs/**/*.png
