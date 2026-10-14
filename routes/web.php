@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SurveyController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -41,3 +42,8 @@ Route::get('/guru', function () {
 Route::get('/murid', function () {
     return view('murid');
 })->middleware('auth');
+
+Route::middleware(['auth', 'role:admin,guru'])->group(function () {
+    Route::resource('surveys', SurveyController::class)->except(['show']);
+    Route::patch('surveys/{survey}/publish', [SurveyController::class, 'publish'])->name('surveys.publish');
+});
