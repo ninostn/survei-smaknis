@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\QueryException;
 
 
 class MuridSurveyController extends Controller
@@ -41,7 +42,7 @@ class MuridSurveyController extends Controller
     public function show(Survey $survey)
     {
         if ($survey->status !== 'aktif') {
-            abort(404);
+            abort(403, 'Survey Ditutup');
         }
 
         $sudahDiisi = $survey->responses()
@@ -54,7 +55,10 @@ class MuridSurveyController extends Controller
                 ->with('error', 'Kamu sudah mengisi survei ini.');
         }
 
-        $survey->load('questions.options');
+        $survey->load([
+            'questions' => fn ($q) => $q->orderBy('urutan'),
+            'questions.options',
+        ]);
 
         return view('murid.surveys.show', compact('survey'));
     }
@@ -63,7 +67,7 @@ class MuridSurveyController extends Controller
     public function store(Request $request, Survey $survey)
     {
         if ($survey->status !== 'aktif') {
-            abort(404);
+            abort(403, 'Survey Ditutup');
         }
 
         $sudahDiisi = $survey->responses()
@@ -76,7 +80,10 @@ class MuridSurveyController extends Controller
                 ->with('error', 'Kamu sudah mengisi survei ini.');
         }
 
-        $survey->load('questions.options');
+        $survey->load([
+            'questions' => fn ($q) => $q->orderBy('urutan'),
+            'questions.options',
+        ]);
 
         $rules = [];
 
@@ -97,28 +104,50 @@ class MuridSurveyController extends Controller
 
         $validated = $request->validate($rules);
 
-        DB::transaction(function () use ($survey, $validated) {
-            $response = Response::create([
-                'survey_id' => $survey->id,
-                'user_id' => Auth::id(),
-                'submitted_at' => now(),
-            ]);
-
-            foreach ($survey->questions as $question) {
-                $value = $validated['jawaban'][$question->id];
-
-                Answer::create([
-                    'response_id' => $response->id,
-                    'question_id' => $question->id,
-                    'option_id' => $question->type === 'essay'
-                        ? null
-                        : (int) $value,
-                    'teks' => $question->type === 'essay'
-                        ? $value
-                        : null,
+        try {
+            DB::transaction(function () use ($survey, $validated) {
+                $response = Response::create([
+                    'survey_id' => $survey->id,
+                    'user_id' => Auth::id(),
+                    'submitted_at' => now(),
                 ]);
+
+                foreach ($survey->questions as $question) {
+                    $value = $validated['jawaban'][$question->id];
+
+                    Answer::create([
+                        'response_id' => $response->id,
+                        'question_id' => $question->id,
+                        'option_id' => $question->type === 'essay'
+                            ? null
+                            : (int) $value,
+                        'teks' => $question->type === 'essay'
+                            ? $value
+                            : null,
+                    ]);
+                }
+            });
+        } catch (QueryException $e) {
+            $sqlState = $e->errorInfo[0] ?? $e->getCode();
+            $driverCode = $e->errorInfo[1] ?? null;
+            $message = strtolower($e->getMessage());
+
+            $duplikat =
+                $sqlState === '23505' ||
+                ($sqlState === '23000' && $driverCode == 1062) ||
+                (
+                    str_contains($message, 'unique constraint failed') &&
+                    str_contains($message, 'responses.')
+                );
+
+            if ($duplikat) {
+                return redirect()
+                    ->route('murid.surveys.index')
+                    ->with('error', 'Kamu sudah mengisi survei ini.');
             }
-        });
+
+            throw $e;
+        }
 
         return redirect()
             ->route('murid.surveys.index')
