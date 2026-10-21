@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\MuridSurveyController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -47,3 +49,21 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
     Route::resource('surveys', SurveyController::class)->except(['show']);
     Route::patch('surveys/{survey}/publish', [SurveyController::class, 'publish'])->name('surveys.publish');
 });
+
+// ROUTE SURVEI MURID
+Route::middleware(['auth', 'role:murid'])
+    ->prefix('murid')
+    ->name('murid.')
+    ->group(function () {
+        Route::get('/surveys', [MuridSurveyController::class, 'index'])
+            ->name('surveys.index');
+
+        Route::get('/surveys/history', [MuridSurveyController::class, 'history'])
+            ->name('surveys.history');
+
+        Route::get('/surveys/{survey}', [MuridSurveyController::class, 'show'])
+            ->name('surveys.show');
+
+        Route::post('/surveys/{survey}', [MuridSurveyController::class, 'store'])
+            ->name('surveys.store');
+    });
