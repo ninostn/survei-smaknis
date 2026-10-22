@@ -31,7 +31,8 @@
         <td>{{ $s->questions_count }}</td>
         <td>{{ $s->responses_count }}</td>
         <td>
-          <a href="{{ route('surveys.edit', $s) }}">Edit</a>
+          <a href="{{ route('surveys.edit', $s) }}">Edit</a> |
+          <a href="{{ route('surveys.results', $s) }}">Hasil</a>
 
           <form method="POST" action="{{ route('surveys.publish', $s) }}" style="display:inline">
             @csrf
