@@ -1,27 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>403 Forbidden - Survei SMAKNIS</title>
-</head>
-<body>
-  <h1>403 Forbidden</h1>
+@extends('layouts.guest')
 
-  @php($pesan = isset($exception) ? trim($exception->getMessage()) : '')
+@section('title', '403 Forbidden - Survei SMAKNIS')
 
-  @if ($pesan !== '')
-    <p>{{ $pesan }}</p>
-  @else
-    <p>You don't have permission to access this page.</p>
+@section('content')
+    @php($pesan = isset($exception) ? trim($exception->getMessage()) : '')
 
-    <hr>
+    <div class="w-full max-w-md text-center">
+        <p class="num text-[12px] font-bold tracking-[0.25em] text-danger">403</p>
+        <h1 class="mt-3 text-xl">{{ $pesan !== '' ? $pesan : 'Forbidden' }}</h1>
 
-    <p>Kamu sudah login, tapi peranmu tidak boleh membuka halaman ini.</p>
-    <p>Contoh: murid membuka halaman admin, atau guru membuka survey milik guru lain.</p>
-  @endif
+        @if ($pesan !== '')
+            <p class="mt-2 text-sm text-muted">Kamu tidak bisa membuka halaman ini saat ini.</p>
+        @else
+            <p class="mt-2 text-sm text-muted">You don't have permission to access this page.</p>
+            <p class="mt-1.5 text-sm text-muted">Kamu sudah login, tapi peranmu tidak boleh membuka halaman ini.</p>
+        @endif
 
-  <p>
-    <a href="/dashboard">Kembali ke Dashboard</a>
-  </p>
-</body>
-</html>
+        <div class="mt-6">
+            <x-button href="/dashboard" variant="secondary">Kembali ke Dashboard</x-button>
+        </div>
+    </div>
+@endsection

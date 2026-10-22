@@ -1,41 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>{{ $survey ? 'Edit Survey' : 'Buat Survey' }}</title>
-</head>
-<body>
-  <h1>{{ $survey ? 'Edit Survey' : 'Buat Survey' }}</h1>
+@extends('layouts.app')
 
-  <p>
-    <a href="{{ route('surveys.index') }}">Kembali</a>
-  </p>
+@section('title', $survey ? 'Edit Survei' : 'Buat Survei')
 
-  @if ($errors->any())
-    <p>{{ $errors->first() }}</p>
-  @endif
+@section('heading', $survey ? 'Edit Survei' : 'Buat Survei')
+@section('subheading', $survey ? 'Ubah judul atau deskripsi survei.' : 'Isi judul dan deskripsi singkat. Soal ditambahkan setelah survei dibuat.')
 
-  <form method="POST" action="{{ $survey ? route('surveys.update', $survey) : route('surveys.store') }}">
-    @csrf
-    @if ($survey)
-      @method('PUT')
-    @endif
+@section('actions')
+    <x-button href="{{ route('surveys.index') }}" variant="secondary">Kembali</x-button>
+@endsection
 
-    <div>
-      <label>Judul</label><br>
-      <input type="text" name="judul" value="{{ old('judul', $survey->judul ?? '') }}" maxlength="150">
+@section('content')
+    <div class="max-w-2xl">
+        <x-card>
+            <form method="POST"
+                  action="{{ $survey ? route('surveys.update', $survey) : route('surveys.store') }}"
+                  class="space-y-5">
+                @csrf
+                @if ($survey)
+                    @method('PUT')
+                @endif
+
+                <x-field label="Judul" name="judul" hint="Maksimal 150 karakter.">
+                    <input id="judul" name="judul" type="text" class="input" maxlength="150"
+                           value="{{ old('judul', $survey->judul ?? '') }}"
+                           placeholder="Contoh: Survei Kepuasan Siswa" autofocus>
+                </x-field>
+
+                <x-field label="Deskripsi" name="deskripsi" hint="Opsional. Jelaskan tujuan survei.">
+                    <textarea id="deskripsi" name="deskripsi" rows="4" class="textarea"
+                              placeholder="Tuliskan tujuan survei...">{{ old('deskripsi', $survey->deskripsi ?? '') }}</textarea>
+                </x-field>
+
+                <div class="flex items-center gap-2 pt-1">
+                    <x-button type="submit">Simpan</x-button>
+                    <x-button href="{{ route('surveys.index') }}" variant="ghost">Batal</x-button>
+                </div>
+            </form>
+        </x-card>
     </div>
-
-    <br>
-
-    <div>
-      <label>Deskripsi</label><br>
-      <textarea name="deskripsi" rows="4">{{ old('deskripsi', $survey->deskripsi ?? '') }}</textarea>
-    </div>
-
-    <br>
-
-    <button type="submit">Simpan</button>
-  </form>
-</body>
-</html>
+@endsection
