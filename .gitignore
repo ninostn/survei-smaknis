@@ -1,7 +1,7 @@
 # --- Laravel ---
 /vendor
 /node_modules
-/public/build
+# public/build sengaja di-commit: anggota tanpa Node tetap melihat UI ter-build
 /public/hot
 /public/storage
 /storage/*.key
