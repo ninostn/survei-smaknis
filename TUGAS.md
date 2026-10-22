@@ -9,7 +9,8 @@ Yang belum bisa dasar Git / Laravel / PHP, pelajari mandiri dulu (install, clone
 - Migrasi 8/8 Ran: users, surveys, questions, options, responses, answers + cache, jobs, sessions
 - 6 model + relasi, seeder 3 akun, auth NIS + role admin/guru/murid
 - CRUD Survey + publish + error pages 403/404
-- Commit acuan: fa521b9, branch utama: main
+- Isi survey murid (M4) + halaman hasil mentah (M5) sudah masuk `main`
+- Commit acuan: `c6931b1`, branch utama: `main`
 
 ## 2. Branch (nama dikunci)
 
@@ -47,15 +48,18 @@ DB_PASSWORD=
 
 ```bash
 php artisan migrate:fresh --seed
+php artisan db:seed --class=DemoSurveySeeder
 php artisan serve
 ```
+
+`DemoSurveySeeder` membuat 1 survey contoh berisi 4 soal (2 Likert, 1 PG, 1 esai) supaya alur isi survey dan halaman hasil bisa dites sebelum CRUD soal (M2/M3) selesai. Jalankan hanya di lokal.
 
 Cek: login 1001 (admin) / 1002 (guru) / 1003 (murid), password `password123`.
 
 ## 4. Ketua — Inti + Integrasi
 
-- H3: transaksi isi survey (`responses + answers` satu transaksi), cek aktif/403, tolak double.
-- H4: query hasil (`$counts`, `$avgLikert`, `$essays`), tanpa grafik.
+- H3: transaksi isi survey (`responses + answers` satu transaksi) — **dikerjakan M4, sudah di-merge**. Ketua hanya merapikan 403 + duplikat.
+- H4: query hasil `ResultController@show` (`$counts`, `$avgLikert`, `$essays`), route `surveys/{survey}/results`, tanpa grafik.
 - Policy pemilik, publish, review + merge, testing 3 role, hosting prep, seluruh UI belakangan.
 - Mengunci kontrak route + variabel + validasi. Perubahan kontrak hanya oleh ketua.
 
@@ -86,29 +90,40 @@ Cek: login 1001 (admin) / 1002 (guru) / 1003 (murid), password `password123`.
 - Aturan: soal type essay dilarang tambah opsi (tolak + pesan)
 - Selesai jika: PG/Likert bisa tambah opsi + nilai, essay ditolak dengan pesan.
 
-## 8. M4 — Halaman Murid
+## 8. M4 — Halaman Murid (sudah di-merge)
 
 - Branch: `feat/m4-murid`
-- File: daftar survey aktif + form isi polos (radio + textarea), riwayat isian
-- Variabel dari ketua: daftar terima `$surveys`, form terima `$survey + $questions`
-- Dilarang ubah query/transaksi milik ketua. Hanya Blade + form.
+- File: `MuridSurveyController` + `views/murid/surveys/{index,show,history}.blade.php`
+- Route (`name('murid.surveys.*')`, middleware `role:murid`):
+  - `GET /murid/surveys` → `index`
+  - `GET /murid/surveys/history` → `history`
+  - `GET /murid/surveys/{survey}` → `show`
+  - `POST /murid/surveys/{survey}` → `store`
+- Kontrak yang harus dijaga:
+  - Simpan `responses + answers` dalam satu `DB::transaction`
+  - Survey nonaktif → `abort(403, 'Survey Ditutup')`
+  - Double submit → pesan "Kamu sudah mengisi survei ini", bukan error 500
+  - Soal selalu urut kolom `urutan`
 - Selesai jika: daftar tampil, form terkirim, pesan Sudah Mengisi dan 403 tampil.
 
-## 9. M5 — Halaman Hasil Mentah
+## 9. M5 — Halaman Hasil Mentah (sudah di-merge)
 
 - Branch: `feat/m5-hasil`
 - File: `views/results/show` tabel angka polos (tanpa grafik, tanpa print cantik)
-- Variabel dari ketua: `$counts`, `$avgLikert`, `$essays`
+- Variabel dari ketua: `$survey`, `$counts`, `$avgLikert`, `$essays` (array/`stdClass`, bukan model Eloquent)
+- Kontrak: ketua mengirim baris sebagai array; view menampilkan header otomatis dari key
 - Dilarang ubah query agregat
 - Selesai jika: tabel COUNT + rata-rata + 20 essay tampil dan angkanya benar.
 
 ## 10. SOP Harian
 
-Mulai (sekali saja):
+Mulai (sekali saja, dari `main` yang sudah terbaru):
 
 ```bash
-git checkout -b feat/mX-nama
+git switch main
 git pull origin main
+git switch -c feat/mX-nama
+git branch --show-current    # harus feat/mX-nama, bukan main
 ```
 
 Selesai 1 halaman:
@@ -129,11 +144,14 @@ git pull origin main
 
 Selesaikan tanda `<<<<<<<`, cek `php artisan migrate:status`, buka halaman, commit, lapor ketua. Mentok lebih dari 1 jam: berhenti, kirim screenshot + nama file ke ketua.
 
-## 11. Checklist Merge (ketua, Rabu + Sabtu)
+## 11. Checklist Merge (ketua)
 
-- migrate:status 8/8 Ran
+- `migrate:status` 8/8 Ran
 - Login 1001/1002/1003 masuk dashboard masing-masing
 - Halaman yang diubah terbuka tanpa error 500
+- Murid: isi survey contoh → sukses, isi lagi → pesan "sudah mengisi"
+- Murid: survey `nonaktif` → 403 "Survey Ditutup", bukan 404
+- Guru: `/surveys/{id}/results` tampil angka; guru buka survey orang lain → 403
 - Tidak ada `dd()`, password asli, atau akun tes nyangkut
 - Push main, anggota pull main
 

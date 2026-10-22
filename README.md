@@ -132,12 +132,14 @@ php artisan serve
 |------|--------|------------|
 | Migrasi database | Selesai | 8 migrasi `Ran`, sinkron ERD: `users` custom + `surveys, questions, options, responses, answers` + `cache, jobs, sessions` |
 | Model Eloquent | Selesai | 6 model: `User, Survey, Question, Option, Response, Answer` beserta relasi `hasMany / belongsTo` |
-| Seeder user | Belum | Rencana: 3 akun dummy `admin / guru / murid` login NIS |
-| Auth NIS + middleware role | Belum | Login `nis + password`, cabang `admin / guru / murid` |
-| CRUD survey + soal + publish | Belum | Admin / guru, tipe `pg / likert / essay`, status `aktif / nonaktif` |
-| Isi survey murid | Belum | Cegah double, 403 saat ditutup, simpan `responses + answers` |
-| Hasil agregat | Belum | `COUNT` + rata-rata Likert + Bar / Pie + 20 essay terbaru |
-| Kelola user + polish UI | Belum | Dashboard per peran |
+| Seeder user | Selesai | 3 akun: `1001` admin, `1002` guru, `1003` murid, password `password123` |
+| Auth NIS + middleware role | Selesai | Login `nis + password`, cabang `admin / guru / murid`, middleware `role:` |
+| CRUD survey + publish | Selesai | `surveys.*` 7 route, policy pemilik, status `aktif / nonaktif` |
+| CRUD soal + opsi | Belum | M2 (`questions`) dan M3 (`options`) belum di-merge |
+| Isi survey murid | Selesai | `murid.surveys.*`, transaksi `responses + answers`, 403 `Survey Ditutup`, tolak double |
+| Hasil agregat | Sebagian | `COUNT` + rata-rata Likert + 20 esai terbaru. Bar / Pie belum |
+| Kelola user | Belum | M1 belum di-merge |
+| Polish UI | Belum | Masih HTML polos sesuai kerangka |
 
 ## Verifikasi Cepat
 

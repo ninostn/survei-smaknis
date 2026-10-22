@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\MuridSurveyController;
+use App\Http\Controllers\ResultController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -48,6 +49,7 @@ Route::get('/murid', function () {
 Route::middleware(['auth', 'role:admin,guru'])->group(function () {
     Route::resource('surveys', SurveyController::class)->except(['show']);
     Route::patch('surveys/{survey}/publish', [SurveyController::class, 'publish'])->name('surveys.publish');
+    Route::get('surveys/{survey}/results', [ResultController::class, 'show'])->name('surveys.results');
 });
 
 // ROUTE SURVEI MURID

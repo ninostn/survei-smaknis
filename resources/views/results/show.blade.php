@@ -1,32 +1,37 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hasil Survei</title>
+    <title>Hasil Survei - {{ $survey->judul }}</title>
 </head>
 <body>
-    <h1>Hasil Survei</h1>
+    <h1>Hasil: {{ $survey->judul }}</h1>
+
+    <p>
+        Status: {{ $survey->status }} |
+        <a href="{{ route('surveys.index') }}">Kembali ke daftar survey</a>
+    </p>
 
     <h2>1. Jumlah Jawaban (COUNT)</h2>
 
     @php
-        $countRows = collect($counts ?? []);
-        $firstCount = $countRows->first();
-        $countColumns = $firstCount !== null
-            ? array_keys((array) $firstCount)
-            : [];
+        $countRows = collect($counts);
+        $countColumns = $countRows->isEmpty()
+            ? []
+            : array_keys((array) $countRows->first());
     @endphp
 
-    <table border="1">
-        <thead>
-            <tr>
-                @foreach ($countColumns as $column)
-                    <th>{{ $column }}</th>
-                @endforeach
-            </tr>
-        </thead>
+    <table border="1" cellpadding="8">
+        @if (count($countColumns))
+            <thead>
+                <tr>
+                    @foreach ($countColumns as $column)
+                        <th>{{ ucwords(str_replace('_', ' ', $column)) }}</th>
+                    @endforeach
+                </tr>
+            </thead>
+        @endif
         <tbody>
             @forelse ($countRows as $count)
                 <tr>
@@ -36,7 +41,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td>Belum ada data jumlah jawaban.</td>
+                    <td colspan="{{ max(count($countColumns), 1) }}">Belum ada data jumlah jawaban.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -45,21 +50,22 @@
     <h2>2. Rata-rata Likert</h2>
 
     @php
-        $likertRows = collect($avgLikert ?? []);
-        $firstLikert = $likertRows->first();
-        $likertColumns = $firstLikert !== null
-            ? array_keys((array) $firstLikert)
-            : [];
+        $likertRows = collect($avgLikert);
+        $likertColumns = $likertRows->isEmpty()
+            ? []
+            : array_keys((array) $likertRows->first());
     @endphp
 
-    <table border="1">
-        <thead>
-            <tr>
-                @foreach ($likertColumns as $column)
-                    <th>{{ $column }}</th>
-                @endforeach
-            </tr>
-        </thead>
+    <table border="1" cellpadding="8">
+        @if (count($likertColumns))
+            <thead>
+                <tr>
+                    @foreach ($likertColumns as $column)
+                        <th>{{ ucwords(str_replace('_', ' ', $column)) }}</th>
+                    @endforeach
+                </tr>
+            </thead>
+        @endif
         <tbody>
             @forelse ($likertRows as $item)
                 <tr>
@@ -69,7 +75,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td>Belum ada data rata-rata Likert.</td>
+                    <td colspan="{{ max(count($likertColumns), 1) }}">Belum ada data rata-rata Likert.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -78,21 +84,22 @@
     <h2>3. Jawaban Esai (Maksimal 20)</h2>
 
     @php
-        $essayRows = collect($essays ?? [])->take(20);
-        $firstEssay = $essayRows->first();
-        $essayColumns = $firstEssay !== null
-            ? array_keys((array) $firstEssay)
-            : [];
+        $essayRows = collect($essays)->take(20);
+        $essayColumns = $essayRows->isEmpty()
+            ? []
+            : array_keys((array) $essayRows->first());
     @endphp
 
-    <table border="1">
-        <thead>
-            <tr>
-                @foreach ($essayColumns as $column)
-                    <th>{{ $column }}</th>
-                @endforeach
-            </tr>
-        </thead>
+    <table border="1" cellpadding="8">
+        @if (count($essayColumns))
+            <thead>
+                <tr>
+                    @foreach ($essayColumns as $column)
+                        <th>{{ ucwords(str_replace('_', ' ', $column)) }}</th>
+                    @endforeach
+                </tr>
+            </thead>
+        @endif
         <tbody>
             @forelse ($essayRows as $essay)
                 <tr>
@@ -102,7 +109,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td>Belum ada jawaban esai.</td>
+                    <td colspan="{{ max(count($essayColumns), 1) }}">Belum ada jawaban esai.</td>
                 </tr>
             @endforelse
         </tbody>
