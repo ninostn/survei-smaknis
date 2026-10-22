@@ -115,6 +115,13 @@ Cek: login 1001 (admin) / 1002 (guru) / 1003 (murid), password `password123`.
 - Dilarang ubah query agregat
 - Selesai jika: tabel COUNT + rata-rata + 20 essay tampil dan angkanya benar.
 
+## 9A. Aturan UI (berlaku untuk semua)
+
+- Ketua yang mengurus `resources/css/app.css`, `resources/views/layouts/*`, dan `resources/views/components/*`.
+- Anggota **tidak mengubah** tiga hal itu. View anggota tetap HTML polos; ketua meng-convert ke Tailwind saat merge.
+- Butuh tampilan baru (misal kartu statistik)? Tulis HTML polos dengan struktur jelas, jangan pasang class Tailwind sendiri.
+- Build aset hanya ketua: `npm run build`, hasil `public/build` ikut di-commit supaya anggota tanpa Node tetap melihat UI.
+
 ## 10. SOP Harian
 
 Mulai (sekali saja, dari `main` yang sudah terbaru):
