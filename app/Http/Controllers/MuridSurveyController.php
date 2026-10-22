@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Survey;
 use App\Models\Response;
 use App\Models\Answer;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +42,7 @@ class MuridSurveyController extends Controller
     public function show(Survey $survey)
     {
         if ($survey->status !== 'aktif') {
-            abort(404);
+            abort(403, 'Survey Ditutup');
         }
 
         $sudahDiisi = $survey->responses()
@@ -54,7 +55,7 @@ class MuridSurveyController extends Controller
                 ->with('error', 'Kamu sudah mengisi survei ini.');
         }
 
-        $survey->load('questions.options');
+        $this->loadQuestions($survey);
 
         return view('murid.surveys.show', compact('survey'));
     }
@@ -63,7 +64,7 @@ class MuridSurveyController extends Controller
     public function store(Request $request, Survey $survey)
     {
         if ($survey->status !== 'aktif') {
-            abort(404);
+            abort(403, 'Survey Ditutup');
         }
 
         $sudahDiisi = $survey->responses()
@@ -76,7 +77,13 @@ class MuridSurveyController extends Controller
                 ->with('error', 'Kamu sudah mengisi survei ini.');
         }
 
-        $survey->load('questions.options');
+        $this->loadQuestions($survey);
+
+        if ($survey->questions->isEmpty()) {
+            return redirect()
+                ->route('murid.surveys.index')
+                ->with('error', 'Survei ini belum memiliki soal.');
+        }
 
         $rules = [];
 
@@ -97,31 +104,52 @@ class MuridSurveyController extends Controller
 
         $validated = $request->validate($rules);
 
-        DB::transaction(function () use ($survey, $validated) {
-            $response = Response::create([
-                'survey_id' => $survey->id,
-                'user_id' => Auth::id(),
-                'submitted_at' => now(),
-            ]);
-
-            foreach ($survey->questions as $question) {
-                $value = $validated['jawaban'][$question->id];
-
-                Answer::create([
-                    'response_id' => $response->id,
-                    'question_id' => $question->id,
-                    'option_id' => $question->type === 'essay'
-                        ? null
-                        : (int) $value,
-                    'teks' => $question->type === 'essay'
-                        ? $value
-                        : null,
+        try {
+            DB::transaction(function () use ($survey, $validated) {
+                $response = Response::create([
+                    'survey_id' => $survey->id,
+                    'user_id' => Auth::id(),
+                    'submitted_at' => now(),
                 ]);
+
+                foreach ($survey->questions as $question) {
+                    $value = $validated['jawaban'][$question->id];
+
+                    Answer::create([
+                        'response_id' => $response->id,
+                        'question_id' => $question->id,
+                        'option_id' => $question->type === 'essay'
+                            ? null
+                            : (int) $value,
+                        'teks' => $question->type === 'essay'
+                            ? $value
+                            : null,
+                    ]);
+                }
+            });
+        } catch (UniqueConstraintViolationException $e) {
+            // Dua submit bersamaan: unique (survey_id, user_id) menolak yang kedua.
+            if (! str_contains($e->getMessage(), 'uq_response_once')) {
+                throw $e;
             }
-        });
+
+            return redirect()
+                ->route('murid.surveys.index')
+                ->with('error', 'Kamu sudah mengisi survei ini.');
+        }
 
         return redirect()
             ->route('murid.surveys.index')
             ->with('success', 'Jawaban survei berhasil disimpan.');
     }
+
+    // Soal selalu tampil urut kolom `urutan`, bukan urut id.
+    private function loadQuestions(Survey $survey): void
+    {
+        $survey->load([
+            'questions' => fn ($query) => $query->orderBy('urutan')->orderBy('id'),
+            'questions.options' => fn ($query) => $query->orderBy('id'),
+        ]);
+    }
 }
+
