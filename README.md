@@ -139,7 +139,7 @@ php artisan serve
 | Isi survey murid | Selesai | `murid.surveys.*`, transaksi `responses + answers`, 403 `Survey Ditutup`, tolak double |
 | Hasil agregat | Sebagian | `COUNT` + rata-rata Likert + 20 esai terbaru. Bar / Pie belum |
 | Kelola user | Belum | M1 belum di-merge |
-| Polish UI | Belum | Masih HTML polos sesuai kerangka |
+| Polish UI | Sebagian | Tema gelap + layout + komponen selesai; halaman M1/M2/M3 menyusul |
 
 ## Verifikasi Cepat
 
