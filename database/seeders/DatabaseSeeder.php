@@ -2,23 +2,22 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\SurveyCategory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
+     *
+     * Hanya memanggil seeder data awal yang idempotent. Akun admin dibuat
+     * terpisah lewat `php artisan app:create-admin` dan tidak boleh dibuat
+     * otomatis di sini.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->admin()->create([
-            'username' => 'admin',
+        $this->call([
+            SurveyCategorySeeder::class,
         ]);
     }
 }
