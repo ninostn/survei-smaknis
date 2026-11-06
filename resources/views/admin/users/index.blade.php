@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Manajemen Akun')
 
-@section('content')
+@section('admin-content')
     <main class="mx-auto w-full max-w-6xl px-4 py-8">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>

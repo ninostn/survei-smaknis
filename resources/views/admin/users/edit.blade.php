@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Edit Akun')
 
-@section('content')
+@section('admin-content')
     <main class="mx-auto w-full max-w-2xl px-4 py-8">
         <a href="{{ route('admin.users.index') }}" class="text-xs font-semibold text-ink-muted hover:text-ink">&larr; Kembali ke daftar akun</a>
 
