@@ -19,6 +19,8 @@
                     ['label' => 'Kelas', 'route' => 'admin.classes.index', 'pattern' => 'admin.classes.*'],
                     ['label' => 'Mata Pelajaran', 'route' => 'admin.subjects.index', 'pattern' => 'admin.subjects.*'],
                     ['label' => 'Penugasan Mengajar', 'route' => 'admin.teaching-assignments.index', 'pattern' => 'admin.teaching-assignments.*'],
+                    ['label' => 'Survei', 'route' => 'surveys.index', 'pattern' => 'surveys.*'],
+                    ['label' => 'Kategori Survei', 'route' => 'admin.survey-categories.index', 'pattern' => 'admin.survey-categories.*'],
                 ];
             @endphp
 

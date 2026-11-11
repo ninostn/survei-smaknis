@@ -10,6 +10,16 @@
             <p class="mt-2 text-sm text-ink-muted">Beranda guru Survei SMAKNIS. Fitur dashboard lengkap menyusul.</p>
         </div>
 
+        <a href="{{ route('surveys.index') }}"
+           class="w-full rounded-2xl bg-accent-lavender px-4 py-3 text-center text-sm font-bold text-white shadow-[0_8px_20px_-6px_rgba(155,153,233,0.5)] transition-colors hover:bg-accent-lavender-soft">
+            Kelola Survei
+        </a>
+
+        <a href="{{ route('responses.index') }}"
+           class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-semibold text-ink-muted transition-colors hover:border-accent-lavender hover:text-ink">
+            Isi Survei
+        </a>
+
         <form method="POST" action="{{ route('logout') }}" class="w-full">
             @csrf
             <button type="submit"

@@ -226,6 +226,23 @@ Unique: `response_id` + `question_id`.
 
 Unique: `answer_id` + `option_id`.
 
+## Timezone
+
+- The application timezone is `Asia/Jakarta` (`UTC+07:00`), set in
+  `config/app.php`.
+- The MySQL connection sets its session timezone to `+07:00` in
+  `config/database.php`. **Both values must always match.** MySQL converts every
+  `TIMESTAMP` column using the session timezone, so a mismatch shifts stored
+  instants.
+- All time columns (`surveys.starts_at`, `surveys.ends_at`,
+  `responses.submitted_at`, and all `created_at`/`updated_at`) are `TIMESTAMP`.
+- `datetime-local` input is treated as local wall-clock time (WIB) with no
+  browser-side conversion; the server parses it in the application timezone.
+- Time comparisons such as `starts_at <= now <= ends_at` are inclusive and made
+  in the application timezone.
+- Do not add `DB_TIMEZONE` or change either timezone without changing the other
+  in the same change.
+
 ## Entity Relationships
 
 - `users` has one optional `students` profile and one optional `teachers` profile.

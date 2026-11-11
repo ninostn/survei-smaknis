@@ -26,6 +26,10 @@
                    class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent-lavender hover:text-ink">
                     Penugasan Mengajar
                 </a>
+                <a href="{{ route('surveys.index') }}"
+                   class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent-lavender hover:text-ink">
+                    Survei
+                </a>
             </div>
         </div>
     </main>

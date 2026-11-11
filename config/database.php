@@ -55,6 +55,9 @@ return [
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
             'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            // Harus sama dengan config('app.timezone'): kolom TIMESTAMP
+            // dikonversi MySQL memakai session timezone ini.
+            'timezone' => '+07:00',
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,

@@ -38,6 +38,8 @@
 - Teachers may target only classes they teach through teaching assignments.
 - Teachers cannot target all students.
 - Admin and teachers may target all teachers or selected teachers.
+- Survey scheduling uses the application timezone `Asia/Jakarta` (WIB). The
+  `starts_at` and `ends_at` values entered in the form are local wall-clock times.
 
 ## 5. Dynamic Questions
 
@@ -60,7 +62,7 @@ Supported question types:
   - student or teacher profile exists;
   - selected student class or teacher target matches the user;
   - survey status is `published`;
-  - current time is within `starts_at` and `ends_at`;
+  - current time is within `starts_at` and `ends_at` (inclusive);
   - user has not submitted a response for the survey.
 - One response per user per survey.
 - Validate answers according to question type.

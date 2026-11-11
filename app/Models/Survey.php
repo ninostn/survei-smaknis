@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -39,6 +40,32 @@ class Survey extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    /**
+     * Status tampilan (bukan status database) untuk survei published.
+     */
+    protected function displayStatus(): Attribute
+    {
+        return Attribute::get(function (): string {
+            if ($this->status === 'closed') {
+                return 'Ditutup';
+            }
+
+            if ($this->status === 'draft') {
+                return 'Draft';
+            }
+
+            if ($this->starts_at !== null && now()->lt($this->starts_at)) {
+                return 'Dijadwalkan';
+            }
+
+            if ($this->ends_at !== null && now()->gt($this->ends_at)) {
+                return 'Berakhir';
+            }
+
+            return 'Berlangsung';
+        });
     }
 
     public function category(): BelongsTo
