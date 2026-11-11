@@ -334,6 +334,12 @@ prevent duplicate responses.
 - Respondents can view published aggregate results.
 - Survey results must not expose individual respondent identities.
 - Free-text answers must not be linked to respondent identity in any result view.
+- Respondent text-answer privacy threshold: minimum 5 total survey responses.
+- The threshold is calculated based on total responses in the survey, not the number of answers per question.
+- If total responses are fewer than 5, text answers are not shown to respondents.
+- If total responses reach 5 or more, text answers are shown anonymously to respondents.
+- Admin and survey creators are not subject to this threshold.
+- Choice and rating aggregates are not subject to this threshold.
 
 ## Important Rules
 

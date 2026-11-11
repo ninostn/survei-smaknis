@@ -73,6 +73,11 @@ Supported question types:
 - Admin can view all survey results.
 - Survey creators can view their own survey results.
 - Respondents can view published aggregate results.
+- Respondents can view free-text answers only when the survey has at least 5 total responses.
+- Free-text answers are hidden from respondents when total survey responses are fewer than 5.
+- This threshold applies to all text questions in the survey.
+- Choice and rating aggregates remain visible regardless of the threshold.
+- Admin and survey creators can view all text answers regardless of response count.
 - Do not expose individual respondent identities.
 - Free-text answers must not be linked to respondent identity.
 
