@@ -77,5 +77,61 @@
                 {{ $surveys->links() }}
             </div>
         @endif
+
+        @if ($submittedSurveysWithResults->isNotEmpty())
+            <h2 class="mt-8 text-sm font-bold text-ink">Hasil Survei yang Sudah Anda Isi</h2>
+            <p class="mt-1 text-xs font-medium text-ink-muted">Lihat hasil agregat survei yang telah dipublikasikan.</p>
+
+            <div class="mt-4 space-y-3">
+                @foreach ($submittedSurveysWithResults as $survey)
+                    <article class="rounded-3xl border border-white bg-white/90 p-5 shadow-[0_10px_30px_-12px_rgba(150,165,205,0.4)]">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div class="min-w-0">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-ink-muted">
+                                        {{ $survey->category?->name ?? 'Tanpa kategori' }}
+                                    </span>
+                                    <span class="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-600">
+                                        Sudah diisi
+                                    </span>
+                                </div>
+
+                                <h2 class="mt-2 text-sm font-bold text-ink">{{ $survey->title }}</h2>
+
+                                @if ($survey->description)
+                                    <p class="mt-1 line-clamp-2 text-xs font-medium text-ink-muted">{{ $survey->description }}</p>
+                                @endif
+
+                                <dl class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-medium text-ink-muted">
+                                    <div class="flex gap-1">
+                                        <dt>Status</dt>
+                                        <dd class="font-semibold text-ink">
+                                            {{ $survey->status === 'published' ? 'Dipublikasikan' : 'Ditutup' }}
+                                        </dd>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <dt>Periode</dt>
+                                        <dd class="font-semibold text-ink">
+                                            {{ $survey->starts_at?->format('d/m/Y') }} - {{ $survey->ends_at?->format('d/m/Y') }}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+
+                            <a href="{{ route('responses.results', $survey) }}"
+                               class="inline-flex shrink-0 items-center justify-center rounded-2xl border border-accent-lavender bg-white px-4 py-2.5 text-xs font-bold text-accent-lavender transition-colors hover:bg-accent-lavender hover:text-white">
+                                Lihat Hasil
+                            </a>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+
+            @if ($submittedSurveysWithResults->hasPages())
+                <div class="mt-5">
+                    {{ $submittedSurveysWithResults->links() }}
+                </div>
+            @endif
+        @endif
     </main>
 @endsection

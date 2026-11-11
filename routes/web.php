@@ -113,6 +113,12 @@ Route::middleware('auth')->group(function () {
             Route::patch('/{survey}/close', [\App\Http\Controllers\SurveyController::class, 'close'])
                 ->whereNumber('survey')->name('close');
 
+            Route::get('/{survey}/results', [\App\Http\Controllers\SurveyResultController::class, 'show'])
+                ->whereNumber('survey')->name('results.show');
+
+            Route::patch('/{survey}/results/publication', [\App\Http\Controllers\SurveyResultController::class, 'updatePublication'])
+                ->whereNumber('survey')->name('results.publication.update');
+
             Route::prefix('/{survey}/questions')
                 ->name('questions.')
                 ->whereNumber('survey')
@@ -142,6 +148,8 @@ Route::middleware('auth')->group(function () {
                 ->whereNumber('survey')->name('show');
             Route::post('/{survey}', [\App\Http\Controllers\SurveyResponseController::class, 'store'])
                 ->whereNumber('survey')->name('store');
+            Route::get('/{survey}/hasil', [\App\Http\Controllers\SurveyResultController::class, 'showForRespondent'])
+                ->whereNumber('survey')->name('results');
         });
 
     Route::prefix('admin/survey-categories')

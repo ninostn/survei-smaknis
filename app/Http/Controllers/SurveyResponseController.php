@@ -24,14 +24,26 @@ class SurveyResponseController extends Controller
 {
     public function index(Request $request): View
     {
-        $surveys = SurveyEligibility::availableFor($request->user())
+        $user = $request->user();
+
+        $surveys = SurveyEligibility::availableFor($user)
             ->with(['category', 'creator:id,username'])
             ->orderBy('ends_at')
             ->orderBy('id')
             ->paginate(10);
 
+        $submittedSurveysWithResults = Survey::query()
+            ->whereIn('status', ['published', 'closed'])
+            ->where('is_result_published', true)
+            ->whereHas('responses', fn ($q) => $q->where('user_id', $user->id))
+            ->with(['category', 'creator:id,username'])
+            ->orderBy('ends_at', 'desc')
+            ->orderBy('id', 'desc')
+            ->paginate(10, ['*'], 'submitted_page');
+
         return view('responses.index', [
             'surveys' => $surveys,
+            'submittedSurveysWithResults' => $submittedSurveysWithResults,
         ]);
     }
 

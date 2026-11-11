@@ -104,6 +104,13 @@
                                         $canManage = auth()->user()?->role === 'admin' || $survey->creator_id === auth()->id();
                                     @endphp
 
+                                    @if ($canManage)
+                                        <a href="{{ route('surveys.results.show', $survey) }}"
+                                           class="inline-flex rounded-xl border border-blue-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-blue-600 transition-colors hover:bg-blue-50">
+                                            Lihat Hasil
+                                        </a>
+                                    @endif
+
                                     @if ($survey->status === 'draft' && $canManage)
                                         <div class="flex flex-wrap items-center gap-2">
                                             <a href="{{ route('surveys.questions.index', $survey) }}"
