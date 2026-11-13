@@ -22,7 +22,7 @@ class StoreStudentAccountRequest extends FormRequest
             'nis' => ['required', 'string', 'max:255', 'unique:students,nis'],
             // Kelas wajib dan hanya boleh kelas yang aktif.
             'class_id' => ['required', 'integer', 'exists:classes,id,is_active,1'],
-            'password' => ['required', 'string', 'min:12', 'confirmed'],
+            'password' => ['required', 'string', 'confirmed'],
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Support\SurveyTargetOptions;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
+use App\Models\SchoolClass;
 
 class SurveyRequest extends FormRequest
 {
@@ -38,12 +39,25 @@ class SurveyRequest extends FormRequest
 
         // Default none hanya untuk create. Pada update, mode target wajib
         // dikirim eksplisit agar request parsial tidak menghapus pivot.
-        if ($this->routeIs('surveys.store')) {
-            $this->merge([
-                'student_target_mode' => $this->input('student_target_mode', 'none'),
-                'teacher_target_mode' => $this->input('teacher_target_mode', 'none'),
-            ]);
+        $this->merge([
+            'student_target_mode' => $this->input(
+                'student_target_mode',
+                $this->user()?->role === 'admin' ? 'all' : 'classes',
+            ),
+            'teacher_target_mode' => 'none',
+        ]);
+
+        $classIds = collect((array) $this->input('target_class_ids', []));
+        $majors = collect((array) $this->input('target_majors', []));
+        $years = collect((array) $this->input('target_academic_years', []));
+        if ($majors->isNotEmpty() || $years->isNotEmpty()) {
+            $classIds = $classIds->merge(SchoolClass::query()
+                ->where('is_active', true)
+                ->when($majors->isNotEmpty(), fn ($q) => $q->whereIn('major', $majors))
+                ->when($years->isNotEmpty(), fn ($q) => $q->whereIn('academic_year', $years))
+                ->pluck('id'));
         }
+        $this->merge(['target_class_ids' => $classIds->unique()->values()->all()]);
     }
 
     /**
@@ -60,16 +74,15 @@ class SurveyRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
             'category_id' => ['required', 'integer', 'exists:survey_categories,id'],
-            'student_target_mode' => ['required', 'string', Rule::in(['none', 'all', 'classes'])],
-            'teacher_target_mode' => ['required', 'string', Rule::in(['none', 'all', 'selected'])],
+            'student_target_mode' => ['required', 'string', Rule::in(['all', 'classes'])],
+            'teacher_target_mode' => ['required', 'string', Rule::in(['none'])],
             'target_class_ids' => ['required_if:student_target_mode,classes', 'array', 'min:1'],
             'target_class_ids.*' => ['integer', 'distinct', Rule::in($allowedClassIds)],
-            'target_teacher_ids' => ['required_if:teacher_target_mode,selected', 'array', 'min:1'],
-            'target_teacher_ids.*' => [
-                'integer',
-                'distinct',
-                Rule::in(SurveyTargetOptions::selectableTeachers()->modelKeys()),
-            ],
+            'target_majors' => ['array'],
+            // Filter target memakai nilai major yang sudah tersimpan agar data legacy tetap kompatibel.
+            'target_majors.*' => ['string', 'distinct'],
+            'target_academic_years' => ['array'],
+            'target_academic_years.*' => ['string', 'distinct'],
         ];
     }
 
@@ -106,9 +119,9 @@ class SurveyRequest extends FormRequest
             'category_id.required' => 'Kategori survei wajib dipilih.',
             'category_id.exists' => 'Kategori survei yang dipilih tidak ditemukan.',
             'student_target_mode.required' => 'Mode target siswa wajib dipilih.',
-            'student_target_mode.in' => 'Mode target siswa tidak valid.',
+            'student_target_mode.in' => 'Pilih target siswa yang valid.',
             'teacher_target_mode.required' => 'Mode target guru wajib dipilih.',
-            'teacher_target_mode.in' => 'Mode target guru tidak valid.',
+            'teacher_target_mode.in' => 'Target guru tidak digunakan.',
             'target_class_ids.required_if' => 'Pilih minimal satu kelas target.',
             'target_class_ids.min' => 'Pilih minimal satu kelas target.',
             'target_class_ids.*.integer' => 'Kelas target yang dipilih tidak valid.',

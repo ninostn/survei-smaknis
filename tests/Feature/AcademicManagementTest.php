@@ -32,6 +32,7 @@ class AcademicManagementTest extends TestCase
     {
         return SchoolClass::create([
             'name' => 'X TKJ '.uniqid(),
+            'major' => 'TJKT',
             'academic_year' => $year,
             'is_active' => $active,
         ]);
@@ -111,6 +112,7 @@ class AcademicManagementTest extends TestCase
         $this->actingAs($this->admin())
             ->post('/admin/classes', [
                 'name' => 'XI RPL 1',
+                'major' => 'PPLG',
                 'academic_year' => '2026/2027',
             ])
             ->assertRedirect('/admin/classes')
@@ -632,6 +634,7 @@ class AcademicManagementTest extends TestCase
                 ->actingAs($admin)
                 ->post('/admin/classes', [
                     'name' => 'XI RPL 9',
+                    'major' => 'PPLG',
                     'academic_year' => '2026/2027',
                 ])
                 ->assertRedirect('/admin/classes/create')

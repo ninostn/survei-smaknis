@@ -167,18 +167,25 @@ class UserManagementTest extends TestCase
         $this->assertNull(User::where('username', $payload['username'])->first());
     }
 
-    public function test_short_password_is_rejected(): void
+    public function test_short_password_is_accepted_for_teacher_and_student_and_reset(): void
     {
-        $payload = $this->teacherPayload([
-            'password' => 'pendek12',
-            'password_confirmation' => 'pendek12',
-        ]);
+        $this->actingAs($this->admin());
+        $password = 'a';
+        $teacher = $this->teacherPayload(['password' => $password, 'password_confirmation' => $password]);
+        $student = $this->studentPayload($this->activeClass(), ['password' => $password, 'password_confirmation' => $password]);
 
-        $this->actingAs($this->admin())
-            ->post('/admin/users/teachers', $payload)
-            ->assertSessionHasErrors('password');
+        $this->post('/admin/users/teachers', $teacher)->assertSessionHasNoErrors();
+        $this->post('/admin/users/students', $student)->assertSessionHasNoErrors();
 
-        $this->assertNull(User::where('username', $payload['username'])->first());
+        foreach ([$teacher, $student] as $payload) {
+            $user = User::where('username', $payload['username'])->firstOrFail();
+            $this->assertTrue(Hash::check($password, $user->password));
+            $this->patch('/admin/users/'.$user->id.'/reset-password', [
+                'password' => 'b',
+                'password_confirmation' => 'b',
+            ])->assertSessionHasNoErrors();
+            $this->assertTrue(Hash::check('b', $user->refresh()->password));
+        }
     }
 
     public function test_password_confirmation_mismatch_is_rejected(): void

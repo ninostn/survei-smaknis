@@ -1,15 +1,16 @@
-@extends('layouts.app')
+@extends(auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app')
 
 @section('title', 'Publikasikan Survei')
 
-@section('content')
-    @include('surveys._nav')
+@section(auth()->user()->role === 'admin' ? 'admin-content' : 'content')
+    @if (auth()->user()->role !== 'admin')
+        @include('surveys._nav')
+    @endif
 
-    <main class="mx-auto w-full max-w-2xl px-4 py-8">
+    <main class="w-full max-w-4xl py-2">
         <a href="{{ route('surveys.index') }}" class="text-xs font-semibold text-ink-muted hover:text-ink">&larr; Kembali ke daftar survei</a>
 
-        <div class="mt-3 rounded-3xl border border-white bg-white/90 p-6 shadow-[0_10px_30px_-12px_rgba(150,165,205,0.4)] sm:p-8">
-            <p class="text-xs font-semibold uppercase tracking-wider text-ink-muted">Manajemen Survei</p>
+        <div data-publish-content class="survey-editor mt-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <h1 class="mt-1 text-xl font-bold tracking-tight text-ink">Publikasikan Survei</h1>
             <p class="mt-1 text-xs font-medium text-ink-muted">Survei: {{ $survey->title }}</p>
 
@@ -61,7 +62,7 @@
                         Batal
                     </a>
                     <button type="submit"
-                            class="rounded-2xl bg-ink px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-slate-700">
+                            class="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700">
                         Publikasikan
                     </button>
                 </div>

@@ -33,7 +33,7 @@ class UserController extends Controller
 
         $users = User::query()
             ->whereIn('role', ['teacher', 'student'])
-            ->with(['student.schoolClass', 'teacher'])
+            ->with(['student.schoolClass', 'teacher.teachingAssignments.subject'])
             ->when($search !== '', function ($query) use ($search) {
                 $like = '%'.$search.'%';
                 $query->where(function ($q) use ($like) {

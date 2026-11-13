@@ -3,14 +3,23 @@
 @section('title', 'Tambah Kategori Survei')
 
 @section('admin-content')
-    <main class="mx-auto w-full max-w-2xl px-4 py-8">
-        <a href="{{ route('admin.survey-categories.index') }}" class="text-xs font-semibold text-ink-muted hover:text-ink">&larr; Kembali ke daftar kategori</a>
-
-        <div class="mt-3 rounded-3xl border border-white bg-white/90 p-6 shadow-[0_10px_30px_-12px_rgba(150,165,205,0.4)] sm:p-8">
-            <p class="text-xs font-semibold uppercase tracking-wider text-ink-muted">Manajemen Survei</p>
-            <h1 class="mt-1 text-xl font-bold tracking-tight text-ink">Tambah Kategori Survei</h1>
-
-            @include('admin.survey-categories._form')
+    <div class="w-full max-w-4xl flex flex-col gap-4">
+        <div>
+            <a href="{{ route('admin.survey-categories.index') }}"
+               class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+                <span>Kembali ke daftar kategori</span>
+            </a>
         </div>
-    </main>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-slate-100">
+                <h1 class="text-base font-bold text-slate-900">Tambah Kategori Survei</h1>
+                <p class="mt-0.5 text-xs text-slate-500">Kategori dipakai untuk mengelompokkan survei.</p>
+            </div>
+            <div class="p-6">
+                @include('admin.survey-categories._form')
+            </div>
+        </div>
+    </div>
 @endsection

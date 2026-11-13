@@ -23,7 +23,9 @@ class DashboardNavigationTest extends TestCase
 
     private const PASSWORD = 'Password-Awal-123';
 
-    private const ACTIVE_NAV = 'bg-white text-ink shadow-sm ring-1 ring-slate-200/70';
+    private const ACTIVE_NAV_ADMIN = 'rounded-xl bg-blue-50';
+
+    private const ACTIVE_NAV_RESPONDENT = 'bg-white text-ink shadow-sm ring-1 ring-slate-200/70';
 
     private Carbon $base;
 
@@ -124,13 +126,13 @@ class DashboardNavigationTest extends TestCase
         ], $overrides));
     }
 
-    private function assertActiveNav(string $url, string $content): void
+    private function assertActiveNav(string $url, string $content, string $token = self::ACTIVE_NAV_ADMIN): void
     {
         $this->assertMatchesRegularExpression(
-            '/href="'.preg_quote($url, '/').'"\s+class="[^"]*'.preg_quote(self::ACTIVE_NAV, '/').'/',
+            '/href="'.preg_quote($url, '/').'"\s+class="[^"]*'.preg_quote($token, '/').'/',
             $content,
         );
-        $this->assertSame(1, substr_count($content, self::ACTIVE_NAV));
+        $this->assertSame(1, substr_count($content, $token));
     }
 
     public function test_every_navigation_route_exists(): void
@@ -200,7 +202,7 @@ class DashboardNavigationTest extends TestCase
         $response = $this->actingAs($this->teacherUser())->get(route('surveys.index'));
 
         $response->assertOk()->assertSee('Isi Survei');
-        $this->assertActiveNav(route('surveys.index'), $response->getContent());
+        $this->assertActiveNav(route('surveys.index'), $response->getContent(), self::ACTIVE_NAV_RESPONDENT);
     }
 
     public function test_student_navigation_marks_respondent_page_active(): void
@@ -208,7 +210,7 @@ class DashboardNavigationTest extends TestCase
         $response = $this->actingAs($this->studentUser())->get(route('responses.index'));
 
         $response->assertOk();
-        $this->assertActiveNav(route('responses.index'), $response->getContent());
+        $this->assertActiveNav(route('responses.index'), $response->getContent(), self::ACTIVE_NAV_RESPONDENT);
     }
 
     public function test_roles_cannot_open_each_others_pages(): void

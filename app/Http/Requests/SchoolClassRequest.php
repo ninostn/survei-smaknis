@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\SchoolClass;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class SchoolClassRequest extends FormRequest
@@ -20,8 +21,18 @@ class SchoolClassRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'major' => ['required', 'string', Rule::in(array_keys(SchoolClass::MAJORS))],
             'academic_year' => ['required', 'string', 'max:50'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $class = $this->route('class');
+
+        if ($class instanceof SchoolClass && ! $this->has('major')) {
+            $this->merge(['major' => $class->major]);
+        }
     }
 
     /**
@@ -59,6 +70,17 @@ class SchoolClassRequest extends FormRequest
                     );
                 }
             },
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'major.required' => 'Jurusan wajib dipilih.',
+            'major.in' => 'Jurusan yang dipilih tidak valid.',
         ];
     }
 }

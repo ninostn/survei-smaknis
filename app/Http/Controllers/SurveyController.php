@@ -37,7 +37,7 @@ class SurveyController extends Controller
         $categoryId = $categoryId === false || $categoryId <= 0 ? null : $categoryId;
 
         $surveys = Survey::query()
-            ->with(['creator', 'category'])
+            ->with(['creator', 'category', 'targetClasses', 'targetTeachers.user'])
             ->withCount('responses')
             ->when($user->role === 'teacher', fn ($q) => $q->where('creator_id', $user->id))
             ->when($search !== '', fn ($q) => $q->where('title', 'like', '%'.$search.'%'))
@@ -86,7 +86,7 @@ class SurveyController extends Controller
                 'title' => $validated['title'],
                 'description' => $validated['description'] ?? null,
                 'student_target_mode' => $validated['student_target_mode'],
-                'teacher_target_mode' => $validated['teacher_target_mode'],
+                'teacher_target_mode' => 'none',
                 'status' => 'draft',
                 'starts_at' => null,
                 'ends_at' => null,
@@ -117,7 +117,7 @@ class SurveyController extends Controller
                 'title' => $validated['title'],
                 'description' => $validated['description'] ?? null,
                 'student_target_mode' => $validated['student_target_mode'],
-                'teacher_target_mode' => $validated['teacher_target_mode'],
+                'teacher_target_mode' => 'none',
             ]);
 
             $this->syncTargets($locked, $validated);

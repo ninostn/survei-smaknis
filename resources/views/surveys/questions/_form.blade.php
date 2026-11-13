@@ -27,7 +27,7 @@
 
 <form method="POST"
       action="{{ $question ? route('surveys.questions.update', [$survey, $question]) : route('surveys.questions.store', $survey) }}"
-      class="mt-6 space-y-5">
+      class="survey-editor mt-6 space-y-5">
     @csrf
     @if ($question)
         @method('PUT')
@@ -84,7 +84,7 @@
             Batal
         </a>
         <button type="submit"
-                class="rounded-2xl bg-ink px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-slate-700">
+                class="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700">
             {{ $question ? 'Simpan Perubahan' : 'Simpan Pertanyaan' }}
         </button>
     </div>

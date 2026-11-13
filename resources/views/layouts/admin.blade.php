@@ -1,48 +1,65 @@
 @extends('layouts.app')
 
 @section('content')
-    <header class="border-b border-white/60 bg-white/50 backdrop-blur">
-        <div class="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-1 gap-y-2 px-4 py-3">
-            <a href="{{ route('admin.dashboard') }}" class="mr-3 flex items-center gap-2">
-                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-tr from-accent-lavender to-accent-lavender-soft text-white">
-                    <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M4 18h4V6L4 18zm6 0h4V6l-4 12zm6-12v12h4L16 6z"></path>
+    <style>
+        @keyframes dash-rise {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: no-preference) {
+            .dash-rise { animation: dash-rise .5s cubic-bezier(.22, 1, .36, 1) backwards; }
+        }
+    </style>
+
+    <div class="mx-auto flex min-h-screen w-full max-w-[1600px] border-x border-slate-200 bg-slate-50">
+        <x-admin-sidebar />
+
+        <div class="flex min-h-screen min-w-0 flex-1 flex-col bg-slate-50">
+            <header class="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 sm:px-8">
+                <div class="min-w-0">
+                    @hasSection('admin-subtitle')
+                        <h1 class="truncate text-sm font-bold leading-5 text-slate-900">@hasSection('admin-heading')@yield('admin-heading')@else @yield('title', 'Survei SMAKNIS') @endif</h1>
+                        <p class="line-clamp-2 text-xs leading-4 text-slate-500">@yield('admin-subtitle')</p>
+                    @else
+                        <p class="truncate text-sm font-bold text-slate-900">@yield('title', 'Survei SMAKNIS')</p>
+                    @endif
+                </div>
+                <div class="flex shrink-0 items-center gap-2">
+                    @yield('admin-topbar-actions')
+                    <button type="button" data-admin-theme-toggle aria-pressed="false" aria-label="Mode gelap" title="Mode gelap"
+                        class="inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-4">
+                        <path d="M20.9 13.3A9 9 0 0 1 10.7 3.1a9 9 0 1 0 10.2 10.2Z" />
                     </svg>
-                </span>
-                <span class="text-sm font-bold tracking-tight text-ink">SMAKNIS <span class="font-medium text-ink-muted">Admin</span></span>
-            </a>
+                    </button>
+                </div>
+            </header>
 
-            @php
-                $adminNav = [
-                    ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'pattern' => 'admin.dashboard'],
-                    ['label' => 'Manajemen Akun', 'route' => 'admin.users.index', 'pattern' => 'admin.users.*'],
-                    ['label' => 'Kelas', 'route' => 'admin.classes.index', 'pattern' => 'admin.classes.*'],
-                    ['label' => 'Mata Pelajaran', 'route' => 'admin.subjects.index', 'pattern' => 'admin.subjects.*'],
-                    ['label' => 'Penugasan Mengajar', 'route' => 'admin.teaching-assignments.index', 'pattern' => 'admin.teaching-assignments.*'],
-                    ['label' => 'Survei', 'route' => 'surveys.index', 'pattern' => 'surveys.*'],
-                    ['label' => 'Kategori Survei', 'route' => 'admin.survey-categories.index', 'pattern' => 'admin.survey-categories.*'],
-                ];
-            @endphp
+            <main class="mx-auto w-full @yield('admin-main-width', 'max-w-6xl') flex-1 px-6 pb-12 pt-8 sm:px-8">
+                @yield('admin-content')
+            </main>
 
-            <nav class="flex flex-1 flex-wrap items-center gap-1">
-                @foreach ($adminNav as $item)
-                    <a href="{{ route($item['route']) }}"
-                       @class([
-                           'rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors',
-                           'bg-white text-ink shadow-sm ring-1 ring-slate-200/70' => request()->routeIs($item['pattern']),
-                           'text-ink-muted hover:bg-white/70 hover:text-ink' => ! request()->routeIs($item['pattern']),
-                       ])>{{ $item['label'] }}</a>
-                @endforeach
-            </nav>
-
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent-lavender hover:text-ink">
-                    Keluar
-                </button>
-            </form>
+            <footer class="border-t border-slate-200 px-6 py-4 sm:px-8">
+                <p class="text-xs text-slate-500">&copy; 2026 SMK Nurul Islam Affandiyah, Cianjur</p>
+            </footer>
         </div>
-    </header>
-
-    @yield('admin-content')
+    </div>
 @endsection
+
+@push('head')
+    <script>
+        (() => {
+            let theme;
+            try {
+                theme = localStorage.getItem('smaknis-admin-theme');
+            } catch {}
+
+            document.documentElement.dataset.adminTheme = theme === 'light' || theme === 'dark'
+                ? theme
+                : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        })();
+    </script>
+    {{-- Preload font ikon Material Symbols agar terunduh sebelum render (cegah ligature tampil sebagai teks mentah) --}}
+    <link rel="preload" as="font" type="font/woff2" href="{{ Vite::asset('resources/fonts/material-symbols-outlined.woff2') }}" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="{{ Vite::asset('resources/fonts/material-symbols-fill.woff2') }}" crossorigin>
+@endpush

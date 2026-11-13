@@ -40,7 +40,7 @@ class SurveyEligibility
 
         return match ($user->role) {
             'student' => self::onlyForStudent($query, $user),
-            'teacher' => self::onlyForTeacher($query, $user),
+            'teacher' => $query->whereRaw('1 = 0'),
             // admin dan role tak dikenal tidak pernah menjadi responden.
             default => $query->whereRaw('1 = 0'),
         };
@@ -67,11 +67,7 @@ class SurveyEligibility
             if (! $student->schoolClass?->is_active) {
                 return false;
             }
-        } elseif ($user->role === 'teacher') {
-            if ($user->teacher === null) {
-                return false;
-            }
-        } else {
+        } elseif ($user->role !== 'student') {
             return false;
         }
 
@@ -161,16 +157,6 @@ class SurveyEligibility
             };
         }
 
-        $teacher = $user->teacher;
-
-        if ($teacher === null) {
-            return false;
-        }
-
-        return match ($survey->teacher_target_mode) {
-            'all' => true,
-            'selected' => $survey->targetTeachers()->where('teachers.id', $teacher->id)->exists(),
-            default => false,
-        };
+        return false;
     }
 }

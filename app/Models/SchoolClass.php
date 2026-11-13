@@ -6,9 +6,19 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'academic_year', 'is_active'])]
+#[Fillable(['name', 'major', 'academic_year', 'is_active'])]
 class SchoolClass extends Model
 {
+    /** @var array<string, string> */
+    public const MAJORS = [
+        'PPLG' => 'Pengembangan Perangkat Lunak dan Gim',
+        'AKL' => 'Akuntansi dan Keuangan Lembaga',
+        'TO' => 'Teknik Otomotif',
+        'MPLB' => 'Manajemen Perkantoran dan Layanan Bisnis',
+        'DKV' => 'Desain Komunikasi Visual',
+        'TJKT' => 'Teknik Jaringan Komputer dan Telekomunikasi',
+    ];
+
     protected $table = 'classes';
 
     /**

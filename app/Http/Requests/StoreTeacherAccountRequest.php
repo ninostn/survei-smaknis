@@ -22,7 +22,7 @@ class StoreTeacherAccountRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             // NIP opsional, tapi wajib unik bila diisi. Tidak semua guru punya NIP.
             'nip' => ['nullable', 'string', 'max:255', 'unique:teachers,nip'],
-            'password' => ['required', 'string', 'min:12', 'confirmed'],
+            'password' => ['required', 'string', 'confirmed'],
         ];
     }
 }
